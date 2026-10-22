@@ -1,0 +1,10 @@
+/*
+ * Screening Room — entry point. Link or import this one file.
+ * Order matters: fonts and tokens first, then the layers that read them.
+ * (With Tailwind, import the parts separately: see DESIGN.md.)
+ */
+@import './fonts.css';
+@import './tokens.css';
+@import './base.css';
+@import './components.css';
+@import './motion.css';

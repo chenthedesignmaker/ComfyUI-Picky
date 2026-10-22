@@ -1,0 +1,10 @@
+# The editor and the prompt node use only the standard library plus what
+# ComfyUI already ships (torch, numpy, aiohttp). This file is deliberately not
+# named requirements.txt, so ComfyUI-Manager does not install ultralytics (and
+# its torch pins) into every setup.
+#
+# Only the face-restoration features (Fix Small Faces, Enhance Faces Only) need
+# these packages:
+opencv-python
+scenedetect
+ultralytics

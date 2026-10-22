@@ -1,0 +1,105 @@
+/*
+ * Screening Room — motion.
+ *
+ * Four patterns, named for what they tell you rather than how they move:
+ *
+ *   1. Stage change  .sr-view / .sr-title    a title card: the old title leaves
+ *                                             up out of its line, the new one
+ *                                             rises into it, the page follows.
+ *   2. Working       .sr-skeleton, .sr-status the shape of the coming result,
+ *                                             with a slow light passing over.
+ *   3. Arriving      .sr-arrive               a result settles into its slot.
+ *   4. Changed       .sr-flash*               an amber mark that fades by itself.
+ *
+ * Durations and curves are tokens; reduced motion zeroes the distances and
+ * keeps the fades (tokens.css). motion.js has the two helpers that need JS.
+ */
+
+/* -------------------------------------------------------- 1 · stage change */
+
+.sr-view.is-leaving > * {
+  animation: sr-fade-out var(--sr-dur-quick) var(--sr-ease-exit) both;
+}
+.sr-view.is-leaving .sr-title__line {
+  animation: sr-title-out var(--sr-dur-quick) var(--sr-ease-exit) both;
+}
+
+/* Title cards also play on their own: a .sr-title__line rises in whenever it
+   mounts inside an .sr-enter parent, with no view switching needed. */
+.sr-view.is-entering .sr-title__line,
+.sr-enter .sr-title__line {
+  animation: sr-title-in var(--sr-dur-scene) var(--sr-ease-enter) backwards;
+}
+/* The rest follows a beat behind the title, one row at a time. Give each
+   row style="--i: n". */
+.sr-view.is-entering .sr-stagger,
+.sr-enter .sr-stagger {
+  animation: sr-rise-in var(--sr-dur-slow) var(--sr-ease-enter) backwards;
+  animation-delay: calc((140ms + var(--i, 0) * 70ms) * var(--sr-slow));
+}
+
+/* A position marker that travels (a rail's current stage, a tab underline):
+   set its transform from JS and it glides. */
+.sr-marker {
+  transition:
+    transform var(--sr-dur-slow) var(--sr-ease-move),
+    height var(--sr-dur-slow) var(--sr-ease-move),
+    width var(--sr-dur-slow) var(--sr-ease-move);
+}
+
+/* ------------------------------------------------------------- 3 · arriving */
+
+.sr-arrive {
+  animation: sr-rise-in var(--sr-dur-slow) var(--sr-ease-enter) backwards;
+}
+
+/* -------------------------------------------------------------- 4 · changed */
+
+.sr-flash { animation: sr-flash-bg var(--sr-dur-linger) var(--sr-ease-enter) both; }
+.sr-flash-text { animation: sr-flash-text var(--sr-dur-linger) var(--sr-ease-enter) both; }
+.sr-flash-edge { animation: sr-flash-edge var(--sr-dur-linger) var(--sr-ease-enter) both; }
+
+/* ------------------------------------------------------------- keyframes */
+
+@keyframes sr-title-in {
+  from { transform: translateY(var(--sr-title-travel)); opacity: var(--sr-title-fade); }
+}
+@keyframes sr-title-out {
+  to { transform: translateY(calc(-1 * var(--sr-title-travel))); opacity: var(--sr-title-fade); }
+}
+@keyframes sr-rise-in {
+  from { transform: translateY(var(--sr-rise)); opacity: 0; }
+}
+@keyframes sr-fade-out {
+  to { opacity: 0; }
+}
+@keyframes sr-flash-bg {
+  from { background-color: var(--sr-accent-soft); }
+}
+@keyframes sr-flash-text {
+  from { color: var(--sr-accent); }
+}
+@keyframes sr-flash-edge {
+  from { border-color: var(--sr-accent); }
+}
+@keyframes sr-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -50% 0; }
+}
+@keyframes sr-breathe {
+  50% { opacity: 0.45; }
+}
+
+/* ------------------------------------------------------- reduced motion */
+
+/* The shimmer is the one looping movement; reduced, it only breathes. */
+:root[data-motion='reduced'] .sr-skeleton > i {
+  background: var(--sr-raised);
+  animation-name: sr-breathe;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion='full']) .sr-skeleton > i {
+    background: var(--sr-raised);
+    animation-name: sr-breathe;
+  }
+}

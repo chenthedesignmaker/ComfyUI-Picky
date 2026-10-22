@@ -1,0 +1,22 @@
+/*
+ * Screening Room — fonts. Self-hosted, so nothing loads from the network.
+ *
+ * Kept apart from tokens.css on purpose: the URLs are relative to this file,
+ * and some bundlers (Tailwind's @import inlining) move CSS without rewriting
+ * them. A tool on such a bundler loads this file through one that does —
+ * Spotlight imports it from layout.tsx so Vite resolves and copies the fonts.
+ */
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('./fonts/archivo-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./fonts/ibm-plex-mono-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}

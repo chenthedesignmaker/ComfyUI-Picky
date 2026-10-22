@@ -1,0 +1,380 @@
+{
+  "unet": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "MiniMax-H3\\minimax_h3_fl2va_ref2va_true_hybrid_b25_49.safetensors",
+      "weight_dtype": "default"
+    },
+    "_meta": {
+      "title": "UNETLoader"
+    }
+  },
+  "clip": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "type": "minimax",
+      "device": "default"
+    },
+    "_meta": {
+      "title": "CLIPLoader"
+    }
+  },
+  "vvae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "avae": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    },
+    "_meta": {
+      "title": "VAELoader"
+    }
+  },
+  "refimg_0": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "video_prompter/character_morning_sheet.jpg"
+    },
+    "_meta": {
+      "title": "Reference image 1"
+    }
+  },
+  "refimg_1": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "video_prompter/character_morning_head.jpg"
+    },
+    "_meta": {
+      "title": "Reference image 2"
+    }
+  },
+  "refimg_2": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "video_prompter/apartment_floorplan.jpg"
+    },
+    "_meta": {
+      "title": "Reference image 3"
+    }
+  },
+  "ref": {
+    "class_type": "MiniMaxH3ReferenceToVideo",
+    "inputs": {
+      "prompt": "subject_definitions:\n<Picture 1> is the same warm, approachable woman in her late twenties to early thirties, with a subtly mixed Asian-Western appearance, textured grown-out pixie-bob hair, cream cartoon-animal pajamas, and soft slippers.\n<Picture 2> is the same woman's facial identity, warm features, dark eyes, and soft piecey bixie hair seen close-up.\n<Picture 3> is the compact apartment's spatial plan, using only its Zone 1 bedroom geometry and its direct connection to the main apartment as an eye-level lived-in set.\n\nsummary:\n[reference generation] Preserve the woman, pajamas, face, and hair from <Picture 1> and <Picture 2>. Use the Zone 1 bedroom geometry from <Picture 3>. One continuous unbroken shot with zero cuts in deep pre-dawn darkness: begins on the white alarm clock, captures the three-step tactile snooze press, then rotates rightward in place to reveal the woman in bed already scowling with tightly shut eyes as she rolls away.\n\nretention_analysis:\n<Picture 1>: fully_preserved - the same warm, approachable woman in her late twenties to early thirties, with a subtly mixed Asian-Western appearance, textured grown-out pixie-bob hair, cream cartoon-animal pajamas, and soft slippers.\n<Picture 2>: fully_preserved - the same woman's facial identity, warm features, dark eyes, and soft piecey bixie hair seen close-up.\n<Picture 3>: attribute_transfer - the compact apartment's spatial plan, using only its Zone 1 bedroom geometry and its direct connection to the main apartment as an eye-level lived-in set.\n\ndetailed_description:\nLive-action naturalism, deep pre-dawn darkness, near-total underexposure, pitch-black shadows, white LED numbers sole light source, macro optics, razor-thin depth of field, subtle 35mm texture. One unbroken eight-second pre-dawn shot opening on the white alarm clock, a three-step tactile button press, then rotating smoothly right to reveal her already deeply scowling face in bed before she rolls away.\n[Shot 1] An unbroken tabletop-level macro shot with the lens resting on the wooden nightstand, initially pointing leftward at the modern digital alarm clock with only the clock and dark wood in frame, then rotating rightward across to the bed, in pitch-black pre-dawn darkness with out any light and lamp, where the glowing white LED digits of the alarm clock are the sole light source, the display advances from 7:29:58 to 7:29:59 and then 7:30:00 as the alarm beeps urgently. At 00:01.000, a sleepy hand in a cream pajama sleeve reaches down onto the nightstand tabletop: first, her palm lands flat onto the dark wood to feel the surface; second, her hand slides forward and grips the side casing of the alarm clock body; third, her fingertips crawl up onto the top surface, locate the raised rectangular snooze button, and press it firmly down at 00:03.000, cutting off the alarm. the room remains dark and only light is from the window behind her bed head. As her hand pulls back, the camera executes a continuous smooth rightward rotation in place across the nightstand to the bed. When the lens reaches her face in bed, she is already in a deep natural scowl with furrowed brow, tightened mouth, and tightly shut eyes from the beeping; maintaining her annoyed scowl and closed eyes, she rolls sharply away toward the far side of the bed: hips, shoulders, and head rotate together beneath the duvet until only her back is visible to the camera. The camera holds static on the clock, then rotates smoothly rightward with large amplitude at steady speed in place from facing the alarm clock on the left to facing the woman in bed on the right.\n\noverall_soundscape: A digital alarm beeps urgently before 7:30. Hand slaps softly on wood, fingers fumble and tap plastic clock casing, then one solid button click silences the beeping. An annoyed sleepy nasal exhale, soft duvet rustle, and pillow compression accompany her rolling away.\n\nnon_diegetic_music: N/A",
+      "width": 576,
+      "height": 352,
+      "length": 192,
+      "ref_image_size": "match",
+      "clip": [
+        "clip",
+        0
+      ],
+      "vae": [
+        "vvae",
+        0
+      ],
+      "audio_vae": [
+        "avae",
+        0
+      ],
+      "ref_images.ref_image_0": [
+        "refimg_0",
+        0
+      ],
+      "ref_images.ref_image_1": [
+        "refimg_1",
+        0
+      ],
+      "ref_images.ref_image_2": [
+        "refimg_2",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "MiniMax H3 Reference to Video"
+    }
+  },
+  "turbo": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "lora_name": "minimax_h3_fl2v_turbo_8step_v1.0_comfyui_bf16.safetensors",
+      "strength_model": 0.0,
+      "model": [
+        "unet",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "turbo"
+    }
+  },
+  "shift": {
+    "class_type": "MiniMaxH3SigmaShift",
+    "inputs": {
+      "shift_video": 12.0,
+      "shift_audio": 3.0,
+      "model": [
+        "turbo",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "MiniMax H3 Sigma Shift"
+    }
+  },
+  "noise": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 4840581272273273
+    },
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "guider": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "model": [
+        "shift",
+        0
+      ],
+      "conditioning": [
+        "ref",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "BasicGuider"
+    }
+  },
+  "ksel": {
+    "class_type": "KSamplerSelect",
+    "inputs": {
+      "sampler_name": "res_multistep"
+    },
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "sched": {
+    "class_type": "BasicScheduler",
+    "inputs": {
+      "scheduler": "simple",
+      "steps": 20,
+      "denoise": 1.0,
+      "model": [
+        "shift",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "BasicScheduler"
+    }
+  },
+  "samp": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "noise",
+        0
+      ],
+      "guider": [
+        "guider",
+        0
+      ],
+      "sampler": [
+        "ksel",
+        0
+      ],
+      "sigmas": [
+        "split_sigmas",
+        0
+      ],
+      "latent_image": [
+        "ref",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "vdec": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "samp2",
+        0
+      ],
+      "vae": [
+        "vvae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAEDecode"
+    }
+  },
+  "adec": {
+    "class_type": "VAEDecodeAudio",
+    "inputs": {
+      "samples": [
+        "samp2",
+        0
+      ],
+      "vae": [
+        "avae",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "VAEDecodeAudio"
+    }
+  },
+  "cvid": {
+    "class_type": "CreateVideo",
+    "inputs": {
+      "fps": 24.0,
+      "images": [
+        "vdec",
+        0
+      ],
+      "audio": [
+        "adec",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "CreateVideo"
+    }
+  },
+  "save": {
+    "class_type": "SaveVideo",
+    "inputs": {
+      "filename_prefix": "video/VideoPrompter_H3ref_00039_base20step_subtle_15x5_1312x768",
+      "format": "auto",
+      "codec": "auto",
+      "video": [
+        "cvid",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SaveVideo"
+    }
+  },
+  "vp_latent": {
+    "class_type": "MiniMaxH3MotionContextSaveLatent",
+    "inputs": {
+      "latent": [
+        "samp",
+        0
+      ],
+      "filename_prefix": "h3_context/take4107089162765260",
+      "clip_index": 1
+    },
+    "_meta": {
+      "title": "Save AV latent (for Extend)"
+    }
+  },
+  "split_sigmas": {
+    "class_type": "SplitSigmas",
+    "inputs": {
+      "sigmas": [
+        "sched",
+        0
+      ],
+      "step": 15
+    },
+    "_meta": {
+      "title": "Split Sigmas (Step 15 of 20)"
+    }
+  },
+  "sep_av": {
+    "class_type": "LTXVSeparateAVLatent",
+    "inputs": {
+      "av_latent": [
+        "samp",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Separate AV Latent"
+    }
+  },
+  "latent_upscaler": {
+    "class_type": "MinimaxH3LatentUpscaler3D",
+    "inputs": {
+      "latent": [
+        "sep_av",
+        0
+      ],
+      "model_name": "minimax_h3_latent_upscaler_3d_fp16.safetensors",
+      "mode": "target dimensions",
+      "width": 1312,
+      "height": 768,
+      "scale": 2.0,
+      "megapixels": 1.0,
+      "align": 32,
+      "enable_temporal_chunking": true,
+      "force_unload": true,
+      "device": "cuda",
+      "precision": "fp16"
+    },
+    "_meta": {
+      "title": "Minimax H3 Latent Upscaler (3D)"
+    }
+  },
+  "concat_av": {
+    "class_type": "LTXVConcatAVLatent",
+    "inputs": {
+      "video_latent": [
+        "latent_upscaler",
+        0
+      ],
+      "audio_latent": [
+        "sep_av",
+        1
+      ]
+    },
+    "_meta": {
+      "title": "Concat AV Latent"
+    }
+  },
+  "samp2": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "noise": [
+        "noise",
+        0
+      ],
+      "guider": [
+        "guider",
+        0
+      ],
+      "sampler": [
+        "ksel",
+        0
+      ],
+      "sigmas": [
+        "split_sigmas",
+        1
+      ],
+      "latent_image": [
+        "concat_av",
+        0
+      ]
+    },
+    "_meta": {
+      "title": "SamplerCustomAdvanced (Pass 2 Subtle Refine)"
+    }
+  }
+}

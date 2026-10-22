@@ -1,0 +1,1 @@
+Locked off, static frame throughout. No push in, no pan, no tilt, no handheld drift.

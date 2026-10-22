@@ -1,0 +1,32 @@
+#camera-planner{width:min(1100px,96vw);max-width:96vw;max-height:94vh;padding:0;border:1px solid var(--line-2);border-radius:14px;background:var(--panel);color:var(--ink);box-shadow:0 24px 100px #0009;overflow:auto}
+#camera-planner::backdrop{background:#05090dbb;backdrop-filter:blur(4px)}
+#camera-planner [hidden]{display:none!important}
+.cp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 26px 16px;border-bottom:1px solid var(--line)}
+.cp-eyebrow{font-size:10px;letter-spacing:.15em;color:var(--accent)}
+.cp-head h2{font-size:24px;margin:4px 0}.cp-head p{margin:0;color:var(--dim);font-size:12px}
+.cp-body{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,1fr);gap:24px;padding:22px 26px}
+.cp-stage{position:relative;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:var(--field)}
+#cp-canvas{display:block;width:100%;height:320px;touch-action:none;cursor:grab}#cp-canvas:active{cursor:grabbing}
+.cp-stage-label{position:absolute;top:14px;left:14px;color:var(--dim);font-size:10px;letter-spacing:.12em;pointer-events:none}
+.cp-stage p{font-size:11px;color:var(--dim);margin:0;padding:12px 15px;background:var(--panel-2)}
+.cp-transport{display:flex;gap:12px;align-items:center;padding:14px 0}.cp-transport input{min-width:0;flex:1;accent-color:var(--accent)}.cp-transport output{font:11px var(--mono);color:var(--dim);white-space:nowrap}.cp-transport button{white-space:nowrap}
+.cp-reference{display:flex;gap:14px;align-items:center;border-top:1px solid var(--line);padding:16px 0}.cp-reference img{width:132px;max-height:95px;object-fit:contain;border-radius:5px;background:var(--stage)}.cp-reference strong{font-size:12px}.cp-reference p,.cp-note{font-size:12px;color:var(--dim);line-height:1.55;margin:5px 0}.cp-note{margin-top:12px}
+.cp-edit-column>label{margin-bottom:15px}.cp-edit-column input:not([type=checkbox]):not([type=range]),.cp-edit-column select{display:block;width:100%;margin-top:5px}
+.cp-key-head,.cp-selected{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px}.cp-selected{margin:16px 0 10px;color:var(--accent)}
+.cp-keyframes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.cp-keyframes button{font-size:11px;padding:7px 10px}.cp-keyframes button.active{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.cp-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px}.cp-controls label{margin:0}.cp-controls label>span{display:block;color:var(--faint);font-size:10px;min-height:16px}.cp-controls input[type=range]{width:100%;accent-color:var(--accent);margin:9px 0 0}.cp-controls+label{margin-top:15px}
+.cp-check{display:flex;align-items:center;gap:9px;font-size:12px}.cp-check input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+.cp-foot{position:sticky;bottom:0;display:flex;align-items:center;gap:9px;padding:14px 26px;background:var(--panel-2);border-top:1px solid var(--line)}.cp-foot p{flex:1;color:var(--dim);font-size:11px;margin:0}.cp-foot button{white-space:nowrap}
+.camera-path-tools{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:7px}.camera-path-tools span{font-size:11px;color:var(--accent)}.camera-field textarea[readonly]{color:var(--dim);background:var(--panel-2)}
+.camera-field .camera-tools[hidden]{display:none}
+@media(max-width:760px){.cp-body{grid-template-columns:1fr;padding:16px;gap:12px}.cp-head{padding:16px}.cp-foot{padding:12px 16px;flex-wrap:wrap}.cp-foot p{flex-basis:100%}#cp-canvas{height:250px}.cp-reference img{width:110px}.cp-foot button{flex:1}#camera-planner{max-height:96vh}}
+@media(prefers-reduced-motion:reduce){#camera-planner::backdrop{backdrop-filter:none}}
+.cp-path-actions{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.cp-path-actions button{font-size:11px}
+.cp-box-preview{position:relative;width:100%;margin-top:12px;background:var(--field);border-radius:6px;overflow:hidden}
+.cp-box-preview img,.cp-box-preview video{display:block;width:100%;height:auto}
+#cp-box-overlay{position:absolute;inset:0;cursor:crosshair;touch-action:none}
+#cp-box-rect{position:absolute;border:2px solid var(--accent);background:var(--accent-dim);box-sizing:border-box;pointer-events:none}
+#cp-box-fields{margin:10px 0}#cp-box-fields input{width:100%;box-sizing:border-box}
+#cp-motion-controls{margin-bottom:16px}#cp-motion-controls select{width:100%;margin:6px 0}
+#cp-diagnostics{border-top:1px solid var(--line);margin-top:14px;padding-top:8px}
+#camera-planner details{font-size:12px;margin:14px 0}#camera-planner details label{display:block;margin-top:10px}

@@ -1,0 +1,320 @@
+/*
+ * Screening Room — components.
+ *
+ * Plain CSS classes, no framework. Each takes its look entirely from tokens,
+ * so a tool can restyle one by redefining tokens on a parent instead of
+ * overriding rules. States are attributes or `is-` classes.
+ */
+
+/* ------------------------------------------------------------- type roles */
+
+/* The title card: wide, heavy, huge. Page and stage titles only. Wrap the
+   text in .sr-title__line inside .sr-title so it can rise into its line. */
+.sr-title {
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  /* Room for descenders, which overflow: hidden would otherwise crop. */
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+  font-size: var(--sr-size-display);
+  font-weight: 800;
+  font-stretch: var(--sr-stretch-display);
+  letter-spacing: var(--sr-track-display);
+  line-height: 0.98;
+}
+.sr-title__line {
+  display: block;
+}
+
+.sr-heading {
+  margin: 0;
+  font-size: var(--sr-size-heading);
+  font-weight: 700;
+  font-stretch: var(--sr-stretch-heading);
+  letter-spacing: -0.01em;
+  line-height: var(--sr-leading-tight);
+}
+
+.sr-lede {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 16px;
+  line-height: var(--sr-leading-snug);
+  color: var(--sr-ink-2);
+}
+
+.sr-prose {
+  max-width: var(--sr-measure);
+  font-size: var(--sr-size-prose);
+  line-height: var(--sr-leading-prose);
+}
+
+/* Small mono caps: stage numbers, section labels, counts. */
+.sr-label {
+  font-family: var(--sr-font-mono);
+  font-size: var(--sr-size-label);
+  font-weight: 400;
+  letter-spacing: var(--sr-track-label);
+  text-transform: uppercase;
+  color: var(--sr-ink-3);
+}
+
+/* Figures that update: tabular so they don't jitter as they count. */
+.sr-num {
+  font-family: var(--sr-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.sr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sr-2);
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--sr-line-strong);
+  border-radius: var(--sr-radius);
+  background: transparent;
+  color: var(--sr-ink);
+  font-size: var(--sr-size-small);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color var(--sr-motion),
+    background var(--sr-motion),
+    color var(--sr-motion);
+}
+.sr-btn:hover:not(:disabled) {
+  border-color: var(--sr-ink-3);
+  background: var(--sr-raised);
+}
+.sr-btn:disabled {
+  cursor: not-allowed;
+  color: var(--sr-ink-3);
+  border-color: var(--sr-line);
+}
+.sr-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* The one main action on a screen. If a screen seems to need two, it needs
+   one primary and one plain. */
+.sr-btn--primary {
+  height: 44px;
+  padding: 0 20px;
+  border-color: var(--sr-accent);
+  background: var(--sr-accent);
+  color: var(--sr-accent-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.sr-btn--primary:hover:not(:disabled) {
+  border-color: var(--sr-accent-hover);
+  background: var(--sr-accent-hover);
+}
+.sr-btn--primary:disabled {
+  border-color: var(--sr-raised);
+  background: var(--sr-raised);
+  color: var(--sr-ink-3);
+}
+
+.sr-btn--quiet {
+  border-color: transparent;
+  color: var(--sr-ink-2);
+  padding: 0 var(--sr-2);
+}
+.sr-btn--quiet:hover:not(:disabled) {
+  border-color: transparent;
+  color: var(--sr-ink);
+}
+
+.sr-btn--danger:hover:not(:disabled) {
+  border-color: var(--sr-danger);
+  color: var(--sr-danger);
+  background: var(--sr-danger-soft);
+}
+
+.sr-btn--small {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+/* ----------------------------------------------------------------- fields */
+
+.sr-field {
+  display: grid;
+  gap: 6px;
+}
+.sr-field > .sr-label {
+  color: var(--sr-ink-2);
+}
+
+.sr-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--sr-line);
+  border-radius: var(--sr-radius);
+  background: var(--sr-field);
+  color: var(--sr-ink);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: border-color var(--sr-motion), box-shadow var(--sr-motion);
+}
+.sr-input::placeholder {
+  color: var(--sr-ink-3);
+}
+.sr-input:hover {
+  border-color: var(--sr-line-strong);
+}
+.sr-input:focus {
+  outline: none;
+  border-color: var(--sr-accent-line);
+  box-shadow: var(--sr-focus);
+}
+
+/* ------------------------------------------------------------------ cards */
+
+.sr-card {
+  padding: var(--sr-4);
+  border: 1px solid var(--sr-line);
+  border-radius: var(--sr-radius-lg);
+  background: var(--sr-surface);
+  transition: background var(--sr-motion), border-color var(--sr-motion);
+}
+.sr-card--interactive:hover {
+  background: var(--sr-raised);
+  border-color: var(--sr-line-strong);
+}
+.sr-card.is-selected {
+  border-color: var(--sr-accent-line);
+  background: var(--sr-raised);
+}
+/* Off is shown by colour, never by opacity: fading the whole card took its
+   text to 1.4:1. It drops its fill and each text steps down one ink. */
+.sr-card.is-off {
+  border-style: dashed;
+  background: transparent;
+  color: var(--sr-ink-2);
+}
+
+/* ----------------------------------------------------------------- switch */
+
+.sr-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 30px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 1px;
+  background: var(--sr-line-strong);
+  cursor: pointer;
+  transition: background var(--sr-motion);
+}
+.sr-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  background: var(--sr-ink-2);
+  transition:
+    transform var(--sr-dur-quick) var(--sr-ease-move),
+    background var(--sr-motion);
+}
+.sr-switch[aria-checked='true'] {
+  background: var(--sr-accent);
+}
+.sr-switch[aria-checked='true']::after {
+  transform: translateX(12px);
+  background: var(--sr-accent-ink);
+}
+
+/* ------------------------------------------------------------ status, note */
+
+/* A small breathing dot and a word: "Writing", "Queued", "Paused". */
+.sr-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sr-font-mono);
+  font-size: var(--sr-size-label);
+  color: var(--sr-ink-3);
+}
+.sr-status::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sr-accent);
+  animation: sr-breathe calc(1400ms * var(--sr-slow)) ease-in-out infinite;
+}
+.sr-status[data-tone='idle']::before {
+  background: var(--sr-ink-3);
+  animation: none;
+}
+.sr-status[data-tone='ok']::before {
+  background: var(--sr-ok);
+  animation: none;
+}
+.sr-status[data-tone='danger']::before {
+  background: var(--sr-danger);
+  animation: none;
+}
+
+/* A message with a coloured edge. Tone sets the edge; the text stays ink so
+   it is always readable. */
+.sr-note {
+  padding: var(--sr-3) var(--sr-4);
+  border-left: 2px solid var(--sr-ink-3);
+  background: var(--sr-surface);
+  color: var(--sr-ink);
+  font-size: var(--sr-size-small);
+  line-height: var(--sr-leading-snug);
+}
+.sr-note[data-tone='accent'] { border-color: var(--sr-accent); background: var(--sr-accent-soft); }
+.sr-note[data-tone='ok'] { border-color: var(--sr-ok); background: var(--sr-ok-soft); }
+.sr-note[data-tone='warn'] { border-color: var(--sr-warn); background: var(--sr-warn-soft); }
+.sr-note[data-tone='danger'] { border-color: var(--sr-danger); background: var(--sr-danger-soft); }
+
+/* ------------------------------------------------------------ progress bar */
+
+.sr-bar {
+  height: 2px;
+  background: var(--sr-line-strong);
+  overflow: hidden;
+}
+.sr-bar > i {
+  display: block;
+  height: 100%;
+  width: var(--value, 0%);
+  background: var(--sr-accent);
+  transition: width var(--sr-dur-slow) var(--sr-ease-move);
+}
+
+/* ------------------------------------------------------------- skeleton */
+
+/* The shape of the coming text, with a slow light passing over it. Used in
+   place of a spinner wherever the result's shape is known. */
+.sr-skeleton {
+  display: grid;
+  gap: 9px;
+}
+.sr-skeleton > i {
+  display: block;
+  height: 9px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--sr-raised) 30%, #2a2a2e 50%, var(--sr-raised) 70%) 0 0 / 300% 100%;
+  animation: sr-shimmer calc(2200ms * var(--sr-slow)) linear infinite;
+}
+.sr-skeleton > i:nth-child(3n + 2) { width: 88%; }
+.sr-skeleton > i:nth-child(3n) { width: 54%; }

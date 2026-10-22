@@ -1,0 +1,4 @@
+No soft dissolves
+no cross-fades
+no whip pans
+no speed ramps between shots
