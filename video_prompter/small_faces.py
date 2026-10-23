@@ -242,7 +242,7 @@ def learned_face_crops(crops, transform, upscale_model):
 
 
 class SmallFaceRefine:
-    CATEGORY = "Video Prompter"
+    CATEGORY = "Picky"
     FUNCTION = "refine"
     RETURN_TYPES = ("IMAGE", "AUDIO", "FLOAT", "STRING")
     RETURN_NAMES = ("images", "audio", "fps", "report")

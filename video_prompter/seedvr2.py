@@ -109,7 +109,7 @@ def face_mask(boxes, width, height):
 class SeedVR2FaceBlend:
     RETURN_TYPES = ("IMAGE",)
     FUNCTION = "blend"
-    CATEGORY = "Video Prompter"
+    CATEGORY = "Picky"
 
     @classmethod
     def INPUT_TYPES(cls):

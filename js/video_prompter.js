@@ -42,7 +42,7 @@ app.registerExtension({
     nodeType.prototype.onNodeCreated = function () {
       onCreated?.apply(this, arguments);
 
-      this.addWidget("button", "Open editor", null, () => {
+      this.addWidget("button", "Open Picky", null, () => {
         window.open(`${API}/app`, "_blank", "noopener");
       });
 

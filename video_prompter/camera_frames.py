@@ -14,7 +14,7 @@ def frame_indices(count, source_fps):
 
 
 class CameraFrames:
-    CATEGORY = "Video Prompter"
+    CATEGORY = "Picky"
     FUNCTION = "prepare"
     RETURN_TYPES = ("IMAGE",)
     RETURN_NAMES = ("reference_frames",)

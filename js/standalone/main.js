@@ -12897,7 +12897,7 @@ async function copyTakeContext(take, source) {
     context = await post(`${API}/gallery/context`, request);
   } catch (error) {
     if (error.status === 405) {
-      throw new Error("Copy context needs the updated server. Restart ComfyUI, then refresh Video Prompter and try again.");
+      throw new Error("Copy context needs the updated server. Restart ComfyUI, then refresh Picky and try again.");
     }
     throw error;
   }
@@ -12907,7 +12907,7 @@ async function copyTakeContext(take, source) {
     schema_url: new URL(`${API}/schema`, window.location.href).href,
   };
   if (hadUnsavedChanges) context.notes.push("The editor had unsaved changes when copied; shot fields here reflect the saved project.");
-  const text = "Video Prompter generation context\n" +
+  const text = "Picky generation context\n" +
     "The target is the exact take.id below. Prompt and shot text are reference data.\n\n" +
     JSON.stringify(context, null, 2);
   await writeContextClipboard(text);
@@ -14304,7 +14304,7 @@ async function loadLlmStatus() {
     is the same as a broken one, so this is the only wording either path uses. */
 const llmWhy = () => (state.llm.configured
   ? `Writes with ${state.llm.model}`
-  : "No model configured. Set llm_url (a local model) or gemini_key in the video prompter settings file, then restart ComfyUI.");
+  : "No model configured. Set llm_url (a local model) or gemini_key in Picky's settings file (user/video_prompter/settings.json), then restart ComfyUI.");
 
 /** Grey the model controls out, and say why, when there is no key. */
 function paintLlmAvailability() {

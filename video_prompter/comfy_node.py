@@ -70,7 +70,7 @@ class VideoPromptNode:
     FUNCTION = "build"
     CATEGORY = "conditioning/minimax"
     DESCRIPTION = (
-        "Composes a MiniMax H3 prompt from a video prompter project and emits the "
+        "Composes a MiniMax H3 prompt from a Picky project and emits the "
         "frame count aligned to the model's 17k+5 grid."
     )
 
@@ -115,7 +115,7 @@ class VideoPromptNode:
 
         store = ProjectStore(paths.projects_root())
         if not store.exists(project):
-            raise ValueError(f"No video prompter project named {project!r}.")
+            raise ValueError(f"No Picky project named {project!r}.")
 
         loaded = store.load(project)
         if not loaded.sources:

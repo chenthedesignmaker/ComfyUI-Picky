@@ -30,7 +30,10 @@ logger = logging.getLogger("ComfyUI.VideoPrompter")
 NODE_CLASS_MAPPINGS = {"VideoPromptNode": VideoPromptNode, "VideoPrompterCameraFrames": CameraFrames,
                        "VideoPrompterSmallFaceRefine": SmallFaceRefine,
                        "VideoPrompterSeedVR2FaceBlend": SeedVR2FaceBlend}
-NODE_DISPLAY_NAME_MAPPINGS = {"VideoPromptNode": "Video Prompt (MiniMax H3)"}
+NODE_DISPLAY_NAME_MAPPINGS = {"VideoPromptNode": "Picky Prompt (MiniMax H3)",
+                              "VideoPrompterCameraFrames": "Picky Camera Frames",
+                              "VideoPrompterSmallFaceRefine": "Picky Small Face Refine",
+                              "VideoPrompterSeedVR2FaceBlend": "Picky SeedVR2 Face Blend"}
 
 WEB_DIRECTORY = "./js"
 
