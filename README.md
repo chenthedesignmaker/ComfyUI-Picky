@@ -1,10 +1,17 @@
-# Video Prompter: an open-weights film studio for MiniMax H3
+# Picky
 
-Video Prompter is a ComfyUI custom node pack and a browser editor for directing
-short films with **MiniMax H3**, using only open weights on your own GPU. It
-works like a timeline editor. You fill a bin with shots, write each shot's
-prompt as a storyboard, render a few seeds, compare the takes side by side,
-keep the best one, trim it and cut it into the timeline.
+**Render it ten ways. Keep the one you love.**
+
+Picky is an open-weights film studio for **MiniMax H3**, made of a ComfyUI
+custom node pack and a browser editor. It runs on your own GPU.
+
+Iterating on a shot in plain ComfyUI leaves you with a folder of
+`ComfyUI_00342_.mp4` files, and you have to guess which prompt and seed made
+each one. Picky keeps every attempt attached to its scene. You render many
+takes of the same shot, compare them side by side and keep the best one. Then
+you take the next step on that take: render it at final quality, extend it,
+enhance it, or cut it into the timeline. Every result stays linked to the
+prompt version and the take it came from.
 
 Built for [#OpenSourceHiggsfield](https://comfy.org/open-source-higgsfield),
 as an open alternative to Higgsfield's *Cinema Studio*.
@@ -57,14 +64,14 @@ as an open alternative to Higgsfield's *Cinema Studio*.
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone <this repo> video_prompter
+git clone <this repo> picky
 ```
 
 The face-restoration features need a few extra Python packages, installed
 into ComfyUI's Python. The rest of the editor needs only the standard library.
 
 ```bash
-python -m pip install -r video_prompter/requirements-faces.txt
+python -m pip install -r picky/requirements-faces.txt
 ```
 
 ### 2. Install the companion node packs
@@ -128,6 +135,10 @@ buttons are disabled.
 ### 5. Start
 
 Restart ComfyUI, then open **http://127.0.0.1:8188/video_prompter/**.
+
+> Picky was called *Video Prompter* during development. That name still
+> appears in the Python package, the URL routes, the settings folder and the
+> `VIDEO_PROMPTER_*` environment variables, so existing projects keep working.
 
 ## A first film in five minutes
 
