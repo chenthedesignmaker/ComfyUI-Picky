@@ -5269,6 +5269,338 @@ function wireLightbox() {
   });
 }
 
+// -- the take viewer ----------------------------------------------------------
+//
+// A take card is 244px wide, which hides exactly the details a take is chosen
+// on, and the browser's fullscreen is a dead end: judging the next take meant
+// exit, click, re-enter. This is the big look as a sheet instead, with the
+// arrow keys walking the grid it was opened from in the grid's own order. By
+// default it holds the playhead across the step, so the same moment can be
+// flipped between takes.
+
+/** Open the viewer on `take`, walking the cards of the grid `card` sits in. */
+function openTakeViewer(take, source, card) {
+  const lineage = card?.closest("#lineage-columns");
+  const root = lineage || card?.closest("#candidates, #review-content") || document;
+  const ids = [...root.querySelectorAll(lineage ? ".lin-cell[data-take-id]" : ".candidate[data-take-id]")]
+    .filter((el) => !el.classList.contains("filter-out") || el.dataset.takeId === take.id)
+    .map((el) => el.dataset.takeId);
+  state.takeViewer = { ids: ids.length ? ids : [take.id], id: take.id, source,
+                       at: Date.now() };
+  hushOthers(null);
+  $("takeview").classList.add("open");
+  renderTakeViewer();
+  $("tv-close").focus();
+}
+
+function closeTakeViewer() {
+  if (!state.takeViewer) return;
+  const video = $("tv-video");
+  video.pause();
+  video.removeAttribute("src");
+  video.load();
+  state.takeViewer = null;
+  $("takeview").classList.remove("open");
+}
+
+function stepTakeViewer(by) {
+  const view = state.takeViewer;
+  if (!view || view.ids.length < 2) return;
+  const at = Math.max(0, view.ids.indexOf(view.id));
+  view.id = view.ids[(at + by + view.ids.length) % view.ids.length];
+  markSeen(view.id);
+  renderTakeViewer();
+}
+
+function renderTakeViewer() {
+  const view = state.takeViewer;
+  if (!view) return;
+  const take = takeById(view.id);
+  if (!take) return closeTakeViewer();
+  const { source } = view;
+
+  const video = $("tv-video");
+  if (video.dataset.takeId !== take.id) {
+    // Carry the moment and the play state across, so stepping compares the
+    // same frame of two takes rather than two openings. Both are read from
+    // the view, not the element: mid-load the element says 0s and paused,
+    // which is how a quick run of arrow presses used to lose the moment.
+    const hold = $("tv-hold").checked && video.getAttribute("src");
+    const time = view.time ?? 0;
+    const playing = view.playing ?? true;
+    const load = view.load = (view.load ?? 0) + 1;
+    video.dataset.takeId = take.id;
+    view.loading = true;
+    video.src = take.url;
+    video.addEventListener("loadedmetadata", () => {
+      // A later step already replaced this source; its seek is not ours.
+      if (state.takeViewer !== view || view.load !== load) return;
+      if (hold) video.currentTime = Math.min(time, Math.max(0, (video.duration || time) - 0.05));
+      view.loading = false;
+    }, { once: true });
+    if (playing || !hold) video.play().catch(() => {});
+  }
+
+  const at = view.ids.indexOf(take.id);
+  $("tv-title").textContent = takeLabel(take);
+  $("tv-count").textContent = view.ids.length > 1 ? `${at + 1} of ${view.ids.length}` : "";
+  $("tv-prev").hidden = $("tv-next").hidden = view.ids.length < 2;
+
+  const tier = tierOf(take);
+  const facts = [];
+  if (tier) facts.push(TIER_LABELS[tier]);
+  if (take.width && take.height) facts.push(`${take.width}×${take.height}`);
+  if (take.seconds) facts.push(`${take.seconds}s`);
+  const schedule = stepsPhrase(take);
+  if (schedule) facts.push(schedule);
+  for (const lora of (take.loras || []).filter((row) => row && typeof row.name === "string")) {
+    facts.push(`${lora.name.split(/[\\/]/).pop().replace(/\.safetensors$/i, "")} × ${lora.strength_model}`);
+  }
+  $("tv-facts").textContent = facts.join(" · ");
+  $("tv-name").textContent = take.filename || "";
+  $("tv-name").title = take.filename || "";
+
+  const stars = $("tv-stars");
+  stars.textContent = "";
+  const rating = ratingOf(take);
+  for (let n = 1; n <= 5; n += 1) {
+    const star = document.createElement("button");
+    star.textContent = n <= rating ? "★" : "☆";
+    star.classList.toggle("on", n <= rating);
+    star.title = n === rating ? "Clear the rating" : `Rate ${n} (${n})`;
+    star.onclick = guard(() => rateTakeViewer(n));
+    stars.append(star);
+  }
+
+  const selected = state.compare.has(take.id);
+  $("tv-compare").innerHTML = label(selected ? "check-square" : "columns",
+    selected ? "Selected" : "Compare", "sm");
+  $("tv-compare").title = selected ? "Deselect from compare (C)" : "Select to compare (C)";
+
+  const inEdit = source ? pathOf(source.id)[state.depth] === take.id : false;
+  const use = $("tv-use");
+  use.hidden = !source;
+  use.classList.toggle("in-edit", inEdit);
+  use.innerHTML = label("check", inEdit ? "In the edit" : "Use this", "sm");
+  $("tv-lineage").hidden = !(lineageTo(take).length > 1 || hasContinuations(take));
+}
+
+async function rateTakeViewer(n) {
+  const take = takeById(state.takeViewer?.id);
+  if (!take) return;
+  await post(`${API}/gallery/annotate`, {
+    project: state.project.name,
+    take: take.id,
+    rating: n === ratingOf(take) ? 0 : n,
+  });
+  await reloadSequence();
+  renderCandidates();
+  renderTakeViewer();
+}
+
+function toggleTakeViewerCompare() {
+  const id = state.takeViewer?.id;
+  if (!id) return;
+  if (state.compare.has(id)) state.compare.delete(id);
+  else if (state.compare.size < MAX_COMPARE) state.compare.add(id);
+  else toast(`Compare takes at most ${MAX_COMPARE} at once.`);
+  renderCandidates();
+  renderTakeViewer();
+}
+
+/** Leave the viewer for the large monitor, playing `how` of the shown take. */
+async function takeViewerToTheater(how) {
+  const take = takeById(state.takeViewer?.id);
+  if (!take) return;
+  closeTakeViewer();
+  openTheater();
+  if (how === "lineage") await playLineage(take);
+  else await playSegment(take);
+}
+
+/**
+ * Keys for the take viewer and the large monitor. Captured at the window, ahead
+ * of everything else, because neither sheet has anything to type into: an
+ * arrow pressed while focus sits on the Hold-time box, or on a field left
+ * focused in the editor behind, was being read as typing and dropped.
+ */
+function sheetKeys(event) {
+  if (state.lightbox || compareState.open) return;
+  if (!state.takeViewer && !state.theater) return;
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+  const handled = () => {
+    event.preventDefault();
+    event.stopPropagation();
+    // A focused button would be clicked again by this key's keyup.
+    if (document.activeElement?.tagName === "BUTTON") document.activeElement.blur();
+  };
+  if (state.takeViewer) {
+    if (event.key === "Escape") { handled(); closeTakeViewer(); }
+    else if (event.key === "ArrowLeft") { handled(); stepTakeViewer(-1); }
+    else if (event.key === "ArrowRight") { handled(); stepTakeViewer(1); }
+    else if (event.key === " ") {
+      handled();
+      const video = $("tv-video");
+      if (video.paused) video.play().catch(() => {}); else video.pause();
+    } else if (/^[1-5]$/.test(event.key)) { handled(); guard(() => rateTakeViewer(Number(event.key)))(); }
+    else if (event.key === "c" || event.key === "C") { handled(); toggleTakeViewerCompare(); }
+    return;
+  }
+  if (event.key === "Escape") { handled(); closeTheater(); }
+  else if (event.key === " ") { handled(); theaterTogglePlay(); }
+  else if (event.key === "ArrowLeft") { handled(); theaterStep(-1); }
+  else if (event.key === "ArrowRight") { handled(); theaterStep(1); }
+}
+
+function wireTakeViewer() {
+  $("tv-close").onclick = closeTakeViewer;
+  window.addEventListener("keydown", sheetKeys, true);
+  // What the viewer is showing, kept while it is settled, so a step carries
+  // the moment even when the next press comes before the new take has loaded.
+  const video = $("tv-video");
+  const track = () => {
+    const view = state.takeViewer;
+    if (!view || view.loading) return;
+    view.time = video.currentTime;
+    view.playing = !video.paused;
+  };
+  for (const type of ["timeupdate", "seeked", "play", "pause"]) video.addEventListener(type, track);
+  // The arrows and the transport never keep focus: a focused button is
+  // clicked again by the Space that was meant to play the video.
+  for (const id of ["tv-prev", "tv-next", "th-prev", "th-next", "th-play"]) {
+    $(id).addEventListener("mousedown", (event) => event.preventDefault());
+  }
+  // A take card that went fullscreen anyway (a browser that ignores
+  // `nofullscreen`, or its own fullscreen key) comes back as the viewer, which
+  // can step to the next take where fullscreen could not.
+  document.addEventListener("fullscreenchange", () => {
+    const el = document.fullscreenElement;
+    const card = el?.tagName === "VIDEO" ? el.closest(".candidate[data-take-id]") : null;
+    const take = card && takeById(card.dataset.takeId);
+    if (!take) return;
+    el.pause();
+    document.exitFullscreen().catch(() => {});
+    openTakeViewer(take, currentSource(), card);
+  });
+  closeOnBackdrop($("takeview"), () => {
+    if (Date.now() - (state.takeViewer?.at ?? 0) < 400) return;
+    closeTakeViewer();
+  });
+  $("tv-prev").onclick = () => stepTakeViewer(-1);
+  $("tv-next").onclick = () => stepTakeViewer(1);
+  $("tv-compare").onclick = toggleTakeViewerCompare;
+  $("tv-segment").onclick = guard(() => takeViewerToTheater("segment"));
+  $("tv-lineage").onclick = guard(() => takeViewerToTheater("lineage"));
+  $("tv-inspect").onclick = () => {
+    const take = takeById(state.takeViewer?.id);
+    const source = state.takeViewer?.source;
+    closeTakeViewer();
+    if (take) openTakeInspector(take, source);
+  };
+  $("tv-use").onclick = guard(async () => {
+    const view = state.takeViewer;
+    if (!view?.source) return;
+    await setPath(view.source.id, view.id);
+    renderCandidates();
+    renderTakeViewer();
+  });
+}
+
+// -- the theater --------------------------------------------------------------
+//
+// The program monitor, big. It is the same stage the timeline and the preview
+// dock use, moved into a sheet, so a lineage plays here exactly as it plays in
+// the edit. It stays up until it is closed, so a run of lineages can be
+// watched one after another at full size.
+
+/** Put the one stage where it belongs now: the theater, the dock, or home. */
+function placeStage() {
+  const stage = $("player-stage");
+  const dock = $("preview-dock");
+  const monitor = document.querySelector(".monitor");
+  if (!stage || !dock || !monitor) return;
+  if (state.theater) {
+    if (stage.parentElement !== $("th-host")) $("th-host").append(stage);
+  } else if (dock.classList.contains("open")) {
+    if (stage.parentElement !== dock) dock.insertBefore(stage, dock.firstChild);
+  } else if (stage.parentElement !== monitor) {
+    monitor.insertBefore(stage, monitor.querySelector(".monitor-bar"));
+  }
+}
+
+function openTheater() {
+  if (state.theater) return;
+  state.theater = true;
+  $("theater").classList.add("open");
+  placeStage();
+  renderTheater();
+  $("th-close").focus();
+}
+
+function closeTheater() {
+  if (!state.theater) return;
+  state.theater = false;
+  $("theater").classList.remove("open");
+  placeStage();
+}
+
+function renderTheater() {
+  if (!state.theater) return;
+  const player = state.player;
+  const preview = player?.mode === "preview";
+  $("th-title").textContent = preview ? (player.label || "Preview") : "Sequence";
+  $("th-position").textContent = $("player-position").textContent || "—";
+  $("th-stat").textContent = $("player-stat").textContent || "";
+  $("th-play").innerHTML = iconHTML(player?.playing ? "pause" : "play", "fill");
+  const count = player?.list?.length ?? 0;
+  $("th-prev").disabled = !count || (player.index ?? 0) <= 0;
+  $("th-next").disabled = !count || (player.index ?? 0) >= count - 1;
+}
+
+/** Play / pause without ending a preview — the timeline's own button treats
+ *  a press after a preview as "back to the edit". */
+function theaterTogglePlay() {
+  const player = state.player;
+  if (player?.playing) stopPlayer();
+  else if (player?.mode === "preview" && player.list.length) {
+    const video = playerVideos()[player.active];
+    playFrom(player.index ?? 0, video?.currentTime);
+  } else togglePlay();
+  renderTheater();
+}
+
+function theaterStep(by) {
+  const player = state.player;
+  if (!player?.list?.length) return;
+  const next = (player.index ?? 0) + by;
+  if (next < 0 || next >= player.list.length) return;
+  // Stepping is not pressing play: paused stays paused, on the piece's start.
+  const wasPlaying = player.playing;
+  playFrom(next);
+  if (!wasPlaying) stopPlayer();
+  renderTheater();
+}
+
+function wireTheater() {
+  $("monitor-theater").onclick = openTheater;
+  $("preview-dock-theater").onclick = openTheater;
+  $("th-close").onclick = closeTheater;
+  closeOnBackdrop($("theater"), closeTheater);
+  $("th-play").onclick = theaterTogglePlay;
+  $("th-prev").onclick = () => theaterStep(-1);
+  $("th-next").onclick = () => theaterStep(1);
+  // The readouts are written by the player in several places; mirroring them
+  // here keeps the theater honest without threading it through each one.
+  const mirror = new MutationObserver(() => renderTheater());
+  for (const id of ["player-position", "player-stat", "tl-play"]) {
+    mirror.observe($(id), { childList: true, characterData: true, subtree: true });
+  }
+  for (const video of playerVideos()) {
+    video.addEventListener("play", renderTheater);
+    video.addEventListener("pause", renderTheater);
+  }
+}
+
 // -- the bin's image view ---------------------------------------------------
 
 function setBinView(view) {
@@ -12299,6 +12631,22 @@ ${tierTitle(take)}`;
   const video = lazyThumb(`${take.url}#t=0.1`);
   card.append(video);
 
+  // The same big look as a take card; the arrows walk the chains' cells.
+  const viewLarge = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    markSeen(take.id);
+    openTakeViewer(take, currentSource(), cell);
+  };
+  video.addEventListener("dblclick", viewLarge);
+  const expand = document.createElement("button");
+  expand.className = "small iconbtn card-expand";
+  expand.title = "View large — arrow keys step through the takes (or double-click)";
+  expand.setAttribute("aria-label", `View ${takeLabel(take)} large`);
+  expand.innerHTML = iconHTML("maximize", "sm");
+  expand.onclick = viewLarge;
+  card.append(expand);
+
   const bar = document.createElement("div");
   bar.className = "tier-bar";
   card.append(bar);
@@ -12997,6 +13345,32 @@ function candidateCard(take, source, chosen = null, sharedName = 0) {
     };
   }
   card.append(video);
+
+  // The big look. A double-click used to throw the card into the browser's
+  // fullscreen, which has no way to the next take; it opens the viewer instead.
+  // The browser's own double-click-to-fullscreen runs inside the controls'
+  // shadow root, before this listener could prevent it, so it is switched off
+  // at the source; `fullscreenchange` below catches any that slips through.
+  video.controlsList?.add("nofullscreen");
+  video.addEventListener("dblclick", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    markSeen(take.id);
+    video.pause();
+    openTakeViewer(take, source, card);
+  }, true);
+  const expand = document.createElement("button");
+  expand.className = "small iconbtn card-expand";
+  expand.title = "View large — arrow keys step through the takes (or double-click the video)";
+  expand.setAttribute("aria-label", `View ${takeLabel(take)} large`);
+  expand.innerHTML = iconHTML("maximize", "sm");
+  expand.onclick = (event) => {
+    event.stopPropagation();
+    markSeen(take.id);
+    video.pause();
+    openTakeViewer(take, source, card);
+  };
+  card.append(expand);
 
   // Watching it is the whole point, and the click above does not see it: the
   // browser's own video controls live in a shadow root that swallows the
@@ -13807,14 +14181,12 @@ function dockPreview(open) {
   if (!stage || !dock || !monitor) return;
 
   if (open) {
-    if (stage.parentElement !== dock) dock.insertBefore(stage, dock.firstChild);
     dock.classList.add("open");
+    placeStage();
     applyDockHeight(savedDockHeight());
   } else {
-    if (stage.parentElement !== monitor) {
-      monitor.insertBefore(stage, monitor.querySelector(".monitor-bar"));
-    }
     dock.classList.remove("open");
+    placeStage();
     // The docked height is an inline style on the shared stage, so it has to
     // come off or the program monitor inherits the dock's size.
     stage.style.height = "";
@@ -14637,6 +15009,8 @@ function wire() {
   wireStudio();
   wireImageWriter();
   wireLightbox();
+  wireTakeViewer();
+  wireTheater();
   configureCompareModal({
     $,
     getState: () => state,
@@ -15129,6 +15503,8 @@ function wire() {
     () => ($("picker")?.classList.contains("open") ? $("picker") : null),
     () => ($("imghist")?.classList.contains("open") ? $("imghist") : null),
     () => ($("lightbox")?.classList.contains("open") ? $("lightbox") : null),
+    () => ($("takeview")?.classList.contains("open") ? $("takeview") : null),
+    () => ($("theater")?.classList.contains("open") ? $("theater") : null),
     () => ($("writer")?.classList.contains("open") ? $("writer") : null),
     () => ($("history")?.classList.contains("open") ? $("history") : null),
     () => ($("projects")?.classList.contains("open") ? $("projects") : null),
@@ -15212,6 +15588,16 @@ function wire() {
       if (!typing && event.key === "ArrowLeft") { event.preventDefault(); stepLightbox(-1); return; }
       if (!typing && event.key === "ArrowRight") { event.preventDefault(); stepLightbox(1); return; }
       if (event.key === "Escape") { closeLightbox(); return; }
+    }
+    // The viewer and large monitor take their keys in `sheetKeys`; nothing
+    // else may reach the edit behind them.
+    if ((state.takeViewer || state.theater) && !state.lightbox && !compareState.open) return;
+    if (!typing && (event.key === "t" || event.key === "T") && !event.ctrlKey && !event.metaKey
+        && !event.altKey && !document.activeElement?.isContentEditable
+        && (state.player?.mode === "preview" || !state.editorOpen)) {
+      event.preventDefault();
+      openTheater();
+      return;
     }
     if (compareState.open) {
       if (event.key === "Escape") {

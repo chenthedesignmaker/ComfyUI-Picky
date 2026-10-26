@@ -35,7 +35,9 @@ def build_workflow(source, width, height, spec, seed, overrides=None):
             "decode_tiled": True, "decode_tile_size": 512, "decode_tile_overlap": 64,
             "tile_debug": "false", "offload_device": "cpu", "cache_model": False}},
         "5": {"class_type": "SeedVR2VideoUpscaler", "inputs": {
-            "image": ["2", 0], "dit": ["3", 0], "vae": ["4", 0], "seed": seed,
+            # H3 seeds are 64-bit; SeedVR2 refuses anything past 2**32 - 1, which
+            # failed validation for nearly every real take.
+            "image": ["2", 0], "dit": ["3", 0], "vae": ["4", 0], "seed": int(seed) % 2**32,
             "resolution": max(1080, min(width, height)),
             # 4n+1 context, 16-frame stride, and a fractional overlap crossfade.
             # The old 5/2 preset switched batches every three frames; overlap 2

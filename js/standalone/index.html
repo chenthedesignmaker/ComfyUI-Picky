@@ -996,7 +996,7 @@
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(244px, 1fr)); gap: 13px; }
   .candidate { border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
-               background: var(--panel); transition: border-color .12s, box-shadow .12s; }
+               position: relative; background: var(--panel); transition: border-color .12s, box-shadow .12s; }
   .candidate:hover { border-color: var(--line-2); }
   /* Unopened. Ahead of .picked and .chosen in the cascade so that a take which
      is somehow both keeps the reading that matters more — what the edit plays
@@ -1565,6 +1565,49 @@
                       background: rgba(10, 12, 16, .82); white-space: nowrap;
                       overflow: hidden; text-overflow: ellipsis; }
   .picker-grid .empty { grid-column: 1 / -1; }
+
+  /* -- take viewer & theater ---------------------------------------------
+     Big enough to see the details a 244px card hides, and still a sheet, so
+     the next take is an arrow key away instead of a fullscreen round trip. */
+  #takeview, #theater { position: fixed; inset: 0; background: rgba(4, 5, 7, .92);
+              backdrop-filter: blur(6px); display: none; z-index: 27; padding: 16px; }
+  #takeview.open, #theater.open { display: flex; }
+  .tv-sheet { width: min(1600px, 97vw); height: 95vh; }
+  /* Fill the stage: a 576px preview is exactly the take that needs scaling up. */
+  #tv-video { width: 100%; height: 100%; object-fit: contain; }
+  .tv-facts { font-family: var(--mono); font-size: 11px; color: var(--dim); white-space: nowrap;
+              overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .tv-keys { font-size: 11px; color: var(--faint); white-space: nowrap; }
+  .tv-foot { align-items: center; flex-wrap: wrap; }
+  .tv-foot .spacer { flex: 1 1 auto; }
+  .tv-stars { display: inline-flex; gap: 1px; }
+  .tv-stars button { background: none; border: 0; padding: 0 2px; font-size: 19px; line-height: 1;
+                     color: var(--faint); cursor: pointer; }
+  .tv-stars button.on { color: var(--warning); }
+  .tv-name { font-family: var(--mono); font-size: 11px; color: var(--faint); min-width: 0;
+             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 40%; }
+  .tv-hold { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--dim);
+             white-space: nowrap; }
+  #tv-next { right: 10px; }
+  .lb-nav { z-index: 1; }
+  #tv-use.in-edit { background: transparent; color: var(--accent); border-color: var(--accent); }
+  .th-sheet { margin: auto; width: min(1700px, 97vw); height: 95vh; background: var(--panel);
+              border: 1px solid var(--line-2); border-radius: 12px; display: flex;
+              flex-direction: column; overflow: hidden; box-shadow: var(--shadow); }
+  .th-host { flex: 1 1 auto; min-height: 0; display: flex; background: #000; }
+  /* The dock sizes the shared stage inline; here it fills the sheet instead. */
+  .th-host > .stage { flex: 1 1 auto; height: auto !important; min-height: 0; border: 0;
+                      border-radius: 0; }
+  .th-bar { flex: 0 0 auto; display: flex; gap: 8px; align-items: center; padding: 8px 14px;
+            border-top: 1px solid var(--line); }
+  .candidate .card-expand { position: absolute; top: 6px; right: 6px; z-index: 3; padding: 4px 5px;
+                            background: rgba(4, 5, 7, .7); border: 1px solid var(--line);
+                            opacity: 0; transition: opacity .12s; }
+  .candidate:hover .card-expand, .candidate .card-expand:focus-visible { opacity: 1; }
+  .lin-card .card-expand { position: absolute; top: 4px; right: 4px; z-index: 3; padding: 3px 4px;
+                           background: rgba(4, 5, 7, .7); border: 1px solid var(--line);
+                           opacity: 0; transition: opacity .12s; }
+  .lin-card:hover .card-expand, .lin-card .card-expand:focus-visible { opacity: 1; }
 
   #lightbox { position: fixed; inset: 0; background: rgba(4, 5, 7, .9);
               backdrop-filter: blur(6px); display: none; z-index: 28; padding: 20px; }
@@ -2457,6 +2500,7 @@
       <div class="monitor-heading"><span class="eyebrow">PROGRAM MONITOR</span><span class="spacer"></span>
         <span class="monitor-hint" id="monitor-mode">Sequence preview</span>
         <button id="monitor-return" class="small ghost" hidden title="Return to your position in the sequence">Back to timeline</button>
+        <button id="monitor-theater" class="small ghost iconbtn" title="Large monitor — big, but not fullscreen (T)" aria-label="Large monitor"><svg class="ico sm" aria-hidden="true"><use href="#i-monitor"></use></svg></button>
         <button id="monitor-fullscreen" class="small ghost iconbtn" title="Fullscreen preview" aria-label="Fullscreen preview"><svg class="ico sm" aria-hidden="true"><use href="#i-maximize"></use></svg></button>
       </div>
       <div class="stage" id="player-stage">
@@ -2865,6 +2909,9 @@
               <svg class="ico sm" aria-hidden="true"><use href="#i-git-branch"></use></svg>
               <span id="preview-dock-label">Preview</span>
               <span class="spacer"></span>
+              <button id="preview-dock-theater" class="fixed small ghost" title="Watch this preview in the large monitor (T)">
+                <svg class="ico sm" aria-hidden="true"><use href="#i-maximize"></use></svg>Large
+              </button>
               <button id="preview-dock-close" class="fixed small ghost" title="Stop preview and return the monitor to the timeline">
                 <svg class="ico sm" aria-hidden="true"><use href="#i-x"></use></svg>Stop
               </button>
@@ -3265,6 +3312,72 @@
             and the words in the box now.</p>
           <div class="hist-diff" id="imghist-diff"></div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Take viewer: one take at a size you can judge it at, with the arrow keys
+       walking the takes grid it was opened from. Not fullscreen, so stepping
+       to the next take is one keypress instead of exit, click, re-enter. -->
+  <div id="takeview" role="dialog" aria-modal="true" aria-labelledby="tv-title">
+    <div class="lb-sheet tv-sheet">
+      <div class="ask-head">
+        <svg class="ico sm spark" aria-hidden="true"><use href="#i-film"></use></svg>
+        <h2 id="tv-title">Take</h2>
+        <span class="ask-scope" id="tv-count"></span>
+        <span class="tv-facts" id="tv-facts"></span>
+        <span class="spacer"></span>
+        <span class="tv-keys">← → step · Space play · 1–5 rate · C compare</span>
+        <button id="tv-close" class="small ghost iconbtn" aria-label="Close" title="Close (Esc)">
+          <svg class="ico sm" aria-hidden="true"><use href="#i-x"></use></svg></button>
+      </div>
+      <div class="lb-stage">
+        <button id="tv-prev" class="lb-nav" aria-label="Previous take" title="Previous take (←)">
+          <svg class="ico" aria-hidden="true"><use href="#i-chevron-left"></use></svg></button>
+        <video id="tv-video" controls loop playsinline></video>
+        <button id="tv-next" class="lb-nav" aria-label="Next take" title="Next take (→)">
+          <svg class="ico" aria-hidden="true"><use href="#i-chevron-right"></use></svg></button>
+      </div>
+      <div class="lb-foot tv-foot">
+        <span class="tv-stars" id="tv-stars" role="group" aria-label="Rating"></span>
+        <span class="tv-name" id="tv-name"></span>
+        <span class="spacer"></span>
+        <label class="tv-hold" title="Keep the playhead where it is when stepping to another take, so the same moment is compared across takes">
+          <input type="checkbox" id="tv-hold" checked> Hold time</label>
+        <button id="tv-compare" class="small ghost"></button>
+        <button id="tv-segment" class="small ghost" title="Play this segment in the large monitor">
+          <svg class="ico sm" aria-hidden="true"><use href="#i-play"></use></svg>Segment</button>
+        <button id="tv-lineage" class="small ghost" title="Play the whole chain up to this take in the large monitor">
+          <svg class="ico sm" aria-hidden="true"><use href="#i-git-branch"></use></svg>Lineage</button>
+        <button id="tv-inspect" class="small ghost" title="Open this take's properties and prompt diff">Inspect</button>
+        <button id="tv-use" class="small primary"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theater: the program monitor at a size you can judge it at. The one
+       stage is moved in here (like the preview dock), so lineages and segments
+       play exactly as they do in the edit, just big. -->
+  <div id="theater" role="dialog" aria-modal="true" aria-labelledby="th-title">
+    <div class="th-sheet">
+      <div class="ask-head">
+        <svg class="ico sm spark" aria-hidden="true"><use href="#i-monitor"></use></svg>
+        <h2 id="th-title">Monitor</h2>
+        <span class="ask-scope" id="th-position">—</span>
+        <span class="spacer"></span>
+        <span class="tv-keys">Space play · ← → previous / next piece · Esc close</span>
+        <button id="th-close" class="small ghost iconbtn" aria-label="Close large monitor" title="Back to the normal monitor (Esc)">
+          <svg class="ico sm" aria-hidden="true"><use href="#i-x"></use></svg></button>
+      </div>
+      <div class="th-host" id="th-host"></div>
+      <div class="th-bar">
+        <button id="th-prev" class="small ghost iconbtn" title="Previous piece (←)" aria-label="Previous piece">
+          <svg class="ico sm" aria-hidden="true"><use href="#i-chevron-left"></use></svg></button>
+        <button id="th-play" class="small iconbtn" title="Play / pause (Space)" aria-label="Play / pause"></button>
+        <button id="th-next" class="small ghost iconbtn" title="Next piece (→)" aria-label="Next piece">
+          <svg class="ico sm" aria-hidden="true"><use href="#i-chevron-right"></use></svg></button>
+        <span class="spacer"></span>
+        <span class="stat" id="th-stat"></span>
       </div>
     </div>
   </div>

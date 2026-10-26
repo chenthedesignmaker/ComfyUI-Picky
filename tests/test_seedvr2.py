@@ -32,6 +32,13 @@ def test_modes_keep_audio_timing_and_never_load_h3(mode,res,size,tags):
     else: assert '7' not in wf
 
 
+def test_a_64_bit_h3_seed_fits_seedvr2s_32_bit_range():
+    spec=RefineSpec.from_request({'enhancement_mode':'seedvr2','enhancement_resolution':'1080p'})
+    p=prepare_refine(source_video='take.mp4',source_take_id='original',source_width=576,
+                     source_height=352,spec=spec,seed=7641838974680053)
+    assert 0 <= p.workflow['5']['inputs']['seed'] <= 2**32 - 1
+
+
 def test_original_size_is_exact_and_upscale_never_downsizes():
     assert output_canvas(1280,720,'original')==(1280,720)
     assert output_canvas(3840,2160,'1080p')==(3840,2160)

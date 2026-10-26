@@ -2,6 +2,10 @@
 
 **Render it ten ways. Keep the one you love.**
 
+▶ **[Watch the 2-minute demo](DEMO_VIDEO_URL)**
+
+![Build and evolve one scene: every prompt version keeps its takes, and the history keeps every version](docs/media/iterate.gif)
+
 Picky is an open-weights film studio for **MiniMax H3**, made of a ComfyUI
 custom node pack and a browser editor. It runs on your own GPU.
 
@@ -15,6 +19,10 @@ prompt version and the take it came from.
 
 Built for [#OpenSourceHiggsfield](https://comfy.org/open-source-higgsfield),
 as an open alternative to Higgsfield's *Cinema Studio*.
+
+![The Picky editor: media library, program monitor and timeline](docs/media/editor.jpg)
+
+![How it works: cast, write, render takes, pick, build on the pick, cut](docs/media/how-it-works.gif)
 
 **What you get:**
 
@@ -43,9 +51,12 @@ as an open alternative to Higgsfield's *Cinema Studio*.
   edits only the fields in scope and then repairs its draft against the
   linter. It runs on any local OpenAI-compatible server (Ollama, LM Studio,
   llama.cpp, vLLM). Gemini is an optional alternative.
-- **Agent-driven.** A [Claude Code](https://claude.com/claude-code) skill
-  (`.claude/skills/video-prompt`) can author, revise and render through the
-  editor's HTTP API, and its edits appear live in the open editor.
+- **Agent-driven.** An agent skill teaches a coding agent the prompt format
+  and the render loop, so it can author, revise and render through the
+  editor's HTTP API while its edits appear live in the open editor. It ships
+  for [Claude Code](https://claude.com/claude-code) in
+  `.claude/skills/video-prompt`, and in `.agents/skills/video-prompt` for
+  Codex and other agents that read that folder.
 
 ## Requirements
 
