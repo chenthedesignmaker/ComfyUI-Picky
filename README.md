@@ -2,7 +2,7 @@
 
 **Render it ten ways. Keep the one you love.**
 
-▶ **[Watch the 2-minute demo](DEMO_VIDEO_URL)**
+▶ **[Watch the 2-minute demo](https://github.com/chenthedesignmaker/ComfyUI-Picky/releases/download/demo/picky-demo.mp4)**
 
 ![Build and evolve one scene: every prompt version keeps its takes, and the history keeps every version](docs/media/iterate.gif)
 
