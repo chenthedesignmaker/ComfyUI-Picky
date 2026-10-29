@@ -1,0 +1,68 @@
+/*
+ * Screening Room — base.
+ *
+ * Page-level defaults. Everything is wrapped in :where() so it carries no
+ * specificity: a tool adopting the system can override any of it with a
+ * plain selector and never has to fight it.
+ */
+
+:where(*, *::before, *::after) {
+  box-sizing: border-box;
+}
+
+:where(html) {
+  -webkit-text-size-adjust: 100%;
+}
+
+:where(body) {
+  margin: 0;
+  background: var(--sr-bg);
+  color: var(--sr-ink);
+  font: 400 var(--sr-size-body) / 1.55 var(--sr-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:where(button, input, textarea, select) {
+  font: inherit;
+  color: inherit;
+}
+
+:where(a) {
+  color: var(--sr-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--sr-line-strong);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--sr-motion);
+}
+:where(a:hover) {
+  text-decoration-color: var(--sr-accent);
+}
+
+::selection {
+  background: var(--sr-ink);
+  color: var(--sr-bg);
+}
+
+:where(:focus-visible) {
+  outline: none;
+  box-shadow: var(--sr-focus);
+}
+
+/* Scrollbars that belong on a dark stage instead of the OS's light grey. */
+:where(html) {
+  scrollbar-color: var(--sr-line-strong) transparent;
+}
+
+/* Film grain, opt-in with <body class="sr-grain">. For presentation pages
+   (a portfolio, a landing page). Leave it off in tools where generated images
+   are being judged: grain over a still changes how the still reads. */
+.sr-grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}

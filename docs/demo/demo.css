@@ -1,0 +1,49 @@
+/* The Picky demo banner: a floating card, so the editor's own layout is untouched. */
+#picky-demo-banner {
+  position: fixed;
+  z-index: 100000;
+  right: 16px;
+  bottom: 16px;
+  max-width: 460px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px 10px 14px;
+  border-radius: 10px;
+  background: rgba(20, 20, 24, 0.94);
+  color: #eee;
+  border: 1px solid rgba(255, 200, 80, 0.55);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  font: 12.5px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+#picky-demo-banner b { color: #ffc850; }
+#picky-demo-banner .links { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+#picky-demo-banner a {
+  color: #111;
+  background: #ffc850;
+  padding: 4px 9px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+}
+#picky-demo-banner button {
+  background: none;
+  border: 0;
+  color: #aaa;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+@media (max-width: 640px) {
+  #picky-demo-banner {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    max-width: none;
+    gap: 8px;
+    padding: 8px 8px 8px 10px;
+    font-size: 11.5px;
+  }
+  #picky-demo-banner a { padding: 4px 7px; }
+}

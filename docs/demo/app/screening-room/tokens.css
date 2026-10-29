@@ -1,0 +1,124 @@
+/*
+ * Screening Room — tokens.
+ *
+ * Every value the system uses lives here, under the --sr- prefix so it can sit
+ * next to any other tool's own variables without colliding. Pick a token,
+ * never a literal. DESIGN.md says why each one is what it is. The faces
+ * themselves are declared in fonts.css.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* --- Surfaces, from furthest back to nearest front. Each step is small:
+     on a black stage, a big jump reads as a hole, not a layer. --- */
+  --sr-bg: #070708;
+  --sr-surface: #111113;
+  --sr-raised: #18181a;
+  --sr-field: #0c0c0e;
+  --sr-overlay: #1c1c1f; /* dialogs, menus, popovers */
+
+  /* --- Ink. One warm off-white and two steps down. ink-3 is the floor: it
+     must clear 4.5:1 on every surface, the lightest being --sr-overlay
+     (4.7:1 there, 4.9:1 on --sr-raised). Nothing is ever dimmed below it
+     with opacity. --- */
+  --sr-ink: #f1efe9;
+  --sr-ink-2: #aeaba4;
+  --sr-ink-3: #8a877f;
+
+  /* --- Lines --- */
+  --sr-line: rgba(255, 255, 255, 0.08);
+  --sr-line-strong: rgba(255, 255, 255, 0.16);
+
+  /* --- Accent. Amber is the only colour with a job beyond status: the one
+     main action on a screen, progress, and "this just changed". --- */
+  --sr-accent: #e9b45c;
+  --sr-accent-hover: #f0c172;
+  --sr-accent-ink: #070708; /* text on an amber fill */
+  --sr-accent-soft: rgba(233, 180, 92, 0.1);
+  --sr-accent-line: rgba(233, 180, 92, 0.4);
+
+  /* --- Status. Line colour, a wash, and text that reads on the wash. Muted on
+     purpose so a warning never outshouts the amber action. --- */
+  --sr-ok: #7cc49a;
+  --sr-ok-soft: rgba(124, 196, 154, 0.1);
+  --sr-warn: #e8915a;
+  --sr-warn-soft: rgba(232, 145, 90, 0.1);
+  --sr-danger: #f07a7a;
+  --sr-danger-soft: rgba(240, 122, 122, 0.1);
+
+  /* --- Type. Archivo is variable in width as well as weight: wide and heavy
+     for titles (type as the image), normal width for everything you read. --- */
+  --sr-font-sans: 'Archivo', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+  --sr-font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  --sr-size-display: clamp(40px, 5.5vw, 72px); /* stage / page titles only */
+  --sr-size-title: 24px;   /* section titles */
+  --sr-size-heading: 17px; /* card and panel headings */
+  --sr-size-prose: 16px;   /* long generated text */
+  --sr-size-body: 15px;    /* interface text */
+  --sr-size-small: 13px;   /* secondary text, buttons */
+  --sr-size-label: 11px;   /* mono caps labels, counts */
+
+  --sr-stretch-display: 125%;
+  --sr-stretch-heading: 110%;
+  --sr-track-display: -0.035em;
+  --sr-track-label: 0.14em;
+
+  --sr-leading-tight: 1.2;
+  --sr-leading-snug: 1.45;
+  --sr-leading-prose: 1.65;
+  --sr-measure: 68ch;
+
+  /* --- Space: one 4px-based scale --- */
+  --sr-1: 4px;
+  --sr-2: 8px;
+  --sr-3: 12px;
+  --sr-4: 16px;
+  --sr-5: 24px;
+  --sr-6: 32px;
+  --sr-7: 48px;
+  --sr-8: 64px;
+
+  /* --- Shape. Nearly square: a cut, not a bubble. --- */
+  --sr-radius: 2px;
+  --sr-radius-lg: 4px;
+
+  /* Only floating things cast a shadow. Cards sit on the stage with a line. */
+  --sr-shadow-pop: 0 0 0 1px var(--sr-line-strong), 0 16px 40px -12px rgba(0, 0, 0, 0.8);
+  --sr-focus: 0 0 0 1px var(--sr-accent), 0 0 0 4px rgba(233, 180, 92, 0.2);
+
+  /* --- Motion. Three speeds and three curves; every animation picks from
+     these. --sr-slow multiplies all of them for judging timing. --- */
+  --sr-slow: 1;
+  --sr-dur-instant: calc(110ms * var(--sr-slow));  /* hover, press, toggle */
+  --sr-dur-quick: calc(220ms * var(--sr-slow));    /* leaving, small reveals */
+  --sr-dur-slow: calc(520ms * var(--sr-slow));     /* arriving, moving between places */
+  --sr-dur-scene: calc(760ms * var(--sr-slow));    /* the title card */
+  --sr-dur-linger: calc(1800ms * var(--sr-slow));  /* a "just changed" mark fading out */
+  --sr-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);  /* fast start, long soft landing */
+  --sr-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);   /* gathers, then goes */
+  --sr-ease-move: cubic-bezier(0.65, 0, 0.35, 1);  /* from one place to another */
+  --sr-motion: var(--sr-dur-instant) var(--sr-ease-enter);
+
+  /* Distances. Reduced motion zeroes these and keeps every fade, because the
+     fades carry information: something arrived, something changed. */
+  --sr-rise: 10px;
+  --sr-title-travel: 105%;
+  --sr-title-fade: 1;
+}
+
+/* A tool can opt out of the OS setting with <html data-motion="full">, or
+   force the reduced version with data-motion="reduced". See DESIGN.md. */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion='full']) {
+    --sr-rise: 0px;
+    --sr-title-travel: 0%;
+    --sr-title-fade: 0;
+  }
+}
+:root[data-motion='reduced'] {
+  --sr-rise: 0px;
+  --sr-title-travel: 0%;
+  --sr-title-fade: 0;
+}

@@ -1,0 +1,57 @@
+/* Four editing views with utilities that stay beside the work. */
+/* Project-wide identities are reachable directly from the main header. */
+#project-library-open { color: var(--violet); }
+#project-library-open[aria-expanded="true"] { background: var(--panel-3); border-color: var(--violet); }
+.project-library { position: fixed; z-index: 21; inset: 88px 22px 22px auto; width: min(760px, calc(100vw - 44px)); overflow: auto; padding: 0 20px 20px; background: var(--panel); border: 1px solid var(--line-2); border-radius: 12px; box-shadow: var(--shadow); }
+.project-library[hidden] { display: none; }
+.project-library .utility-heading { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 0; background: var(--panel); }
+.project-library .utility-heading h3 { margin: 0; font-size: 18px; }
+.project-library .library-scope { color: var(--accent); font-size: 12px; line-height: 1.6; margin: 5px 0 12px; }
+@media (max-width: 900px) {
+  .project-library { inset: 12px; width: auto; padding: 0 12px 12px; }
+}
+#editor .source-name-control { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 11px; color: var(--dim); }
+#editor .source-name-control input { width: 170px; min-width: 70px; padding: 4px 7px; font-size: 12.5px; }
+#editor.docked:not(.open) .source-name-control { flex: 1; min-width: 0; }
+#editor.docked:not(.open) .source-name-control input { flex: 1; }
+#editor #author-tabs { gap: 6px; }
+#editor #author-tabs button { min-width: 58px; }
+#editor #author-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+#editor .editor-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 4px 12px; border-top: 1px solid var(--line); background: var(--panel-2); flex-shrink: 0; }
+#editor .editor-tools button { font-size: 11.5px; min-height: 26px; padding: 3px 8px; }
+#editor .editor-tools .has-errors, #prompt-override-status { color: var(--warning); }
+#editor .generation-settings { display: flex; align-items: end; flex-wrap: wrap; gap: 8px; padding: 6px 12px 2px; background: var(--panel); flex-shrink: 0; }
+#editor .generation-settings label { width: 88px; margin: 0; font-size: 11px; color: var(--dim); }
+#editor .generation-setting { width: 88px; }
+#editor .generation-settings input, #editor .generation-settings select { margin-top: 3px; padding: 4px 7px; height: 28px; font-size: 12px; }
+#editor .generation-settings #quality-hint { font-size: 11px; flex: 1 1 130px; padding-bottom: 4px; color: var(--dim); }
+#editor .editor-utility { flex: 0 0 auto; resize: vertical; overflow: auto; height: 280px; min-height: 130px; max-height: 55vh; border-top: 1px solid var(--line-2); padding: 0 14px 14px; background: var(--panel-2); }
+#editor .editor-utility[hidden] { display: none; }
+#editor .utility-heading { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; background: var(--panel-2); z-index: 2; }
+#editor .utility-heading h3 { font-size: 13px; margin: 0; }
+#editor .editor-utility .group { margin-top: 0; }
+#editor .input-empty, #editor .library-scope, #editor .usage-description { color: var(--dim); font-size: 12px; line-height: 1.6; margin: 5px 0 12px; }
+#editor .library-scope { color: var(--accent); }
+#editor .usage-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
+#editor .usage-controls label { display: flex; gap: 6px; align-items: center; margin: 0; }
+#editor .usage-controls input { width: auto; }
+#editor #usage-summary { font-size: 11px; overflow-x: auto; }
+#editor #usage-summary td, #editor #usage-summary th { padding: 6px 5px; text-align: right; }
+#editor #usage-summary td:first-child, #editor #usage-summary th:first-child { text-align: left; }
+#editor .input-summary { color: var(--dim); font-size: 12px; }
+#editor #utility-prompt #preview { min-height: 100px; }
+@media (max-width: 760px) {
+  #editor .source-name-control { flex: 1 1 100%; }
+  #editor .source-name-control input { flex: 1; }
+  #editor .editor-utility { max-height: 45vh; }
+  #editor #author-tabs { gap: 3px; }
+}
+
+#editor #editor-title, #editor .source-name-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+#editor .source-name-control input { width: 230px; font-weight: 600; font-size: 14px; background: transparent; border-color: transparent; }
+#editor .source-name-control input:hover, #editor .source-name-control input:focus { border-color: var(--line-2); background: var(--panel-2); }
+#editor .utility-heading h3 { margin-right: auto; }
+#editor #author-tabs { flex-wrap: nowrap; gap: 2px; padding-inline: 6px; }
+#editor #author-tabs button { min-width: 0; flex: 1 1 0; padding-inline: 6px; }
+#editor #usage-export-panel[hidden] { display: none; }
+#editor #usage-export-data { width: 100%; font: 11px/1.5 monospace; }

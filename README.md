@@ -4,6 +4,8 @@
 
 ▶ **[Watch the 2-minute demo](https://github.com/chenthedesignmaker/ComfyUI-Picky/releases/download/demo/picky-demo.mp4)**
 
+▶ **[Try the editor in your browser](https://chenthedesignmaker.github.io/ComfyUI-Picky/demo/)** — a recorded LAST ORDER project: play takes, read prompts and lint, pick, rate and fake-render. No GPU needed.
+
 ![Build and evolve one scene: every prompt version keeps its takes, and the history keeps every version](docs/media/iterate.gif)
 
 Picky is an open-weights film studio for **MiniMax H3**, made of a ComfyUI
