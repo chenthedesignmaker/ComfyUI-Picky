@@ -2,7 +2,7 @@
 
 **Render it ten ways. Keep the one you love.**
 
-▶ **[Watch the 2-minute demo](https://youtu.be/VnhMkg72j4w)** ([MP4 download](https://github.com/chenthedesignmaker/ComfyUI-Picky/releases/download/demo/picky-demo.mp4))
+▶ **[Watch the 2-minute demo](https://youtu.be/NMKWWtzNiIM)** ([MP4 download](https://github.com/chenthedesignmaker/ComfyUI-Picky/releases/download/demo/picky-demo.mp4))
 
 ▶ **[Try the editor in your browser](https://chenthedesignmaker.github.io/ComfyUI-Picky/demo/)** — a recorded LAST ORDER project: play takes, read prompts and lint, pick, rate and fake-render. No GPU needed.
 
